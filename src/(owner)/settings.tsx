@@ -1,18 +1,18 @@
 import {
-  HelpCircle, // Replaced CircleQuestionMarkIcon
+  HelpCircle,
   LockKeyhole,
   NotebookText,
   Shield,
   UserPen,
-  ChevronRight, // Added for navigation
+  ChevronRight,
   LogOut,
 } from "lucide-react";
 import Sidebar from "./components/sidebar";
 import { useNavigate, Link } from "react-router";
 import { useAuthStore } from "../(auth)/store/Auth";
 import { useEffect, useState } from "react";
-import ChangePasswordModal from "./components/change_password";
-import UpdateProfileModal from "./components/update_profile";
+import ChangePasswordModal from "./components/modals/change_password";
+import UpdateProfileModal from "./components/modals/update_profile";
 
 const SettingsItem = ({
   icon,

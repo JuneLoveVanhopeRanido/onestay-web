@@ -4,7 +4,7 @@ import { type Room, roomAPI } from "../api/room";
 import Sidebar from "./components/sidebar";
 import { useResortStore } from "./store/resort";
 import { Users, Plus, AlertCircle, Inbox } from "lucide-react";
-import CreateRoomModal from "./components/add_room";
+import CreateRoomModal from "./components/modals/add_room";
 
 // --- Helper Components ---
 

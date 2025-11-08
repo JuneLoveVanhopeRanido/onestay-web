@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Home, Check, X, AlertCircle } from "lucide-react";
-import { roomAPI, type Room } from "../../api/room";
+import { roomAPI, type Room } from "../../../api/room";
 
 interface CreateRoomFormData {
   resort_id: string;

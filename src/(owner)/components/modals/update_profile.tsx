@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect, type FormEvent } from "react";
 import { X, User, Mail, AlertCircle, CheckCircle } from "lucide-react";
-import { useAuthStore } from "../../(auth)/store/Auth";
-import { userAPI } from "../../api/user";
+import { useAuthStore } from "../../../(auth)/store/Auth";
+import { userAPI } from "../../../api/user";
 
 interface UpdateProfileModalProps {
   isOpen: boolean;
@@ -113,7 +113,7 @@ export default function UpdateProfileModal({
           </button>
           <h3 className="font-bold text-2xl">Edit profile</h3>
         </div>
-        {/* --- Error/Success --- */}
+
         {error && (
           <div className="alert alert-error shadow-lg mt-4">
             <div>
@@ -131,7 +131,6 @@ export default function UpdateProfileModal({
           </div>
         )}
 
-        {/* --- Form Section --- */}
         <div className="form-control gap-4 py-4">
           <fieldset className="fieldset">
             <legend className="fieldset-legend">Name</legend>
@@ -166,7 +165,6 @@ export default function UpdateProfileModal({
           </fieldset>
         </div>
 
-        {/* --- Actions --- */}
         <div className="modal-action">
           <button
             type="button"

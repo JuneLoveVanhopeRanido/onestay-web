@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Sidebar from "./components/sidebar";
 import { useEffect, useState, useCallback } from "react";
@@ -6,6 +7,7 @@ import dayjs from "dayjs";
 import { AlertCircle, Check, ThumbsDown, X } from "lucide-react";
 import { getStatusColor } from "./helpers/ui";
 import { useParams, useNavigate } from "react-router";
+import type { User } from "../(auth)/types/user";
 
 // --- Helper Components ---
 
@@ -134,7 +136,7 @@ export default function ViewReservationScreen() {
             <input
               type="text"
               className="input w-full"
-              value={reservation.user_id.username || "N/A"}
+              value={(reservation.user_id.username as string) || "N/A"}
               disabled={true}
             />
           </fieldset>
@@ -143,7 +145,7 @@ export default function ViewReservationScreen() {
             <input
               type="text"
               className="input w-full"
-              value={reservation.user_id.email || "N/A"}
+              value={(reservation.user_id.email as User["email"]) || "N/A"}
               disabled={true}
             />
           </fieldset>

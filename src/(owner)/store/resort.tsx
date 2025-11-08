@@ -10,7 +10,7 @@ interface ResortState {
   error: string | null;
   hasCheckedResorts: boolean;
   hasResorts: boolean;
-  isHydrated: boolean; // To track if persistence has rehydrated
+  isHydrated: boolean;
 
   fetchResortsByOwner: () => Promise<void>;
   refreshResorts: () => Promise<void>;
@@ -23,7 +23,7 @@ const initialState = {
   error: null,
   hasCheckedResorts: false,
   hasResorts: false,
-  isHydrated: false, // Default to false
+  isHydrated: false,
 };
 
 export const useResortStore = create<ResortState>()(

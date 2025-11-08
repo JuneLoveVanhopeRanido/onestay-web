@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Sidebar from "./components/sidebar";
 import dayjs from "dayjs";
@@ -128,7 +129,7 @@ export default function GuestsScreen() {
       return reservations;
     }
 
-    const monthIndex = allMonths.indexOf(selectedMonth); // "January" -> 0
+    const monthIndex = allMonths.indexOf(selectedMonth);
 
     return reservations.filter((reservation) => {
       return dayjs(reservation.start_date).month() === monthIndex;
@@ -141,7 +142,7 @@ export default function GuestsScreen() {
 
   useEffect(() => {
     fetchReservations();
-  }, []); // Empty dependency array ensures this runs only once on mount
+  }, []);
 
   const handleSearch = () => {
     setCurrentPage(1);

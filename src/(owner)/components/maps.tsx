@@ -1,5 +1,5 @@
 import React from "react";
-import { MapPin, ExternalLink } from "lucide-react";
+import { MapPin } from "lucide-react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 
 interface Location {

@@ -24,7 +24,7 @@ import {
 } from "lucide-react";
 import ResortScreenMaps from "./components/maps";
 import { Link } from "react-router";
-import EditResortModal from "./components/edit_resort";
+import EditResortModal from "./components/modals/edit_resort";
 import type { Resort } from "../api/resort";
 
 // --- Reusable Helper Components ---
@@ -161,7 +161,7 @@ const ReservationsTable = ({
                 </td>
                 <td className="text-right">
                   <Link
-                    to={`/view/${reservation._id}`}
+                    to={`/view/reservation/${reservation._id}`}
                     className="btn btn-sm btn-ghost"
                   >
                     View details
@@ -477,7 +477,7 @@ export default function DashboardScreen() {
               <label className="flex items-center gap-2">
                 <ListFilter size={16} className="opacity-70" />
                 <select
-                  className="select select-bordered select-sm w-[160px]"
+                  className="select select-bordered select-sm w-40"
                   value={selectedFilter}
                   onChange={(e) => setSelectedFilter(e.target.value)}
                 >
@@ -495,7 +495,7 @@ export default function DashboardScreen() {
                   id="month-select"
                   value={selectedMonth}
                   onChange={(e) => setSelectedMonth(e.target.value)}
-                  className="select select-bordered select-sm w-[160px]"
+                  className="select select-bordered select-sm w-40"
                 >
                   <option value={"All"}>All Months</option>
                   {allMonths.map((monthName) => (

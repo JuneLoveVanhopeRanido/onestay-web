@@ -2,8 +2,8 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { AlertCircle, MapPin, X, Camera, LocateFixed } from "lucide-react";
 import { useState, useRef, useEffect, useMemo } from "react";
-import { resortAPI, type Resort, type ResortFormData } from "../../api/resort";
-import { useResortStore } from "../store/resort";
+import { resortAPI, type Resort, type ResortFormData } from "../../../api/resort";
+import { useResortStore } from "../../store/resort";
 import L, { LatLng } from "leaflet";
 import {
   useMapEvents,
@@ -13,7 +13,7 @@ import {
   Popup,
   TileLayer,
 } from "react-leaflet";
-import { useAuthStore } from "../../(auth)/store/Auth";
+import { useAuthStore } from "../../../(auth)/store/Auth";
 
 // @ts-ignore
 delete L.Icon.Default.prototype._getIconUrl;
@@ -324,7 +324,6 @@ export default function EditResortModal({
             />
           </div>
 
-          {/* Address */}
           <div className="flex flex-col gap-2">
             <label className="label">
               <span className="label-text font-medium">Address *</span>
@@ -338,7 +337,6 @@ export default function EditResortModal({
             ></textarea>
           </div>
 
-          {/* Location */}
           <div className="flex flex-col gap-2">
             <label className="label">
               <span className="label-text font-medium">Location</span>
@@ -361,24 +359,21 @@ export default function EditResortModal({
                 <MapCentering center={mapCenter} zoom={mapZoom} />
                 <MapClickEvents onSelect={handleMapClick} />
 
-                {/* Marker for user's current location */}
                 {currentLocation && (
                   <Marker position={currentLocation} opacity={0.7}>
                     <Popup>Your Location</Popup>
                   </Marker>
                 )}
 
-                {/* Draggable marker for selected location */}
                 <DraggableMarker
                   position={selectedLatLng}
                   setPosition={handleMarkerDrag}
                 />
               </MapContainer>
 
-              {/* Find My Location Button */}
               <button
-                type="button" // Important: prevent form submission
-                className={`btn btn-primary btn-circle absolute bottom-4 right-4 z-[1000] ${
+                type="button"
+                className={`btn btn-primary btn-circle absolute bottom-4 right-4 z-1000 ${
                   loadingLocation ? "loading" : ""
                 }`}
                 onClick={findMyLocation}
@@ -399,7 +394,6 @@ export default function EditResortModal({
             )}
           </div>
 
-          {/* Description */}
           <div className="flex flex-col gap-2">
             <label className="label">
               <span className="label-text font-medium">Description</span>
@@ -413,7 +407,6 @@ export default function EditResortModal({
             ></textarea>
           </div>
 
-          {/* Image */}
           {/* <div className="flex flex-col gap-2">
             <label className="label">
               <span className="label-text font-medium">Resort Image</span>

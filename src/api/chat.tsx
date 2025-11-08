@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// This code is from your new `chatService.ts` file
 import type { OwnerChat } from "../(owner)/socket/chat-socket";
 import { authenticatedApiRequest } from "../api/client";
 

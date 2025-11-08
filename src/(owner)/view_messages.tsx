@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ArrowLeft, Wifi, WifiOff, Send } from "lucide-react";
-import React, { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useParams, useNavigate } from "react-router";
 import { chatService } from "../api/chat";
 import ErrorModal from "./components/chat_error";
@@ -22,8 +22,8 @@ const formatMessageTime = (date: Date) => {
 // --- Main Component ---
 
 export default function OwnerChatConversation() {
-  const { chatId } = useParams(); // Replaces useLocalSearchParams
-  const navigate = useNavigate(); // Replaces router
+  const { chatId } = useParams();
+  const navigate = useNavigate();
   const [message, setMessage] = useState("");
   const [currentChat, setCurrentChat] = useState<OwnerChat | null>(null);
   const [socketConnected, setSocketConnected] = useState(false);
@@ -236,7 +236,6 @@ export default function OwnerChatConversation() {
           }`,
         });
 
-        // Remove the optimistic message on error
         setCurrentChat((prevChat) => {
           if (!prevChat) return null;
           return {
@@ -250,27 +249,20 @@ export default function OwnerChatConversation() {
     }
   };
 
-  // --- Scroll Logic ---
-
-  // Auto-scroll to bottom on new message
   useEffect(() => {
     if (messageListRef.current) {
       const { scrollTop, scrollHeight, clientHeight } = messageListRef.current;
-      // Only auto-scroll if user is already near the bottom
       if (scrollHeight - scrollTop - clientHeight < 150) {
         messageListRef.current.scrollTop = messageListRef.current.scrollHeight;
       }
     }
   }, [currentChat?.messages.length]);
 
-  // Scroll to bottom on initial load
   useEffect(() => {
     if (!loading && messageListRef.current) {
       messageListRef.current.scrollTop = messageListRef.current.scrollHeight;
     }
   }, [loading]);
-
-  // REMOVED: handleScroll() function is no longer needed
 
   // --- Render Message Bubble ---
 
@@ -414,7 +406,7 @@ export default function OwnerChatConversation() {
           <button
             onClick={handleSendMessage}
             disabled={!message.trim() || !socketConnected}
-            className={`w-12 h-12 rounded-full flex items-center justify-center ml-3 flex-shrink-0
+            className={`w-12 h-12 rounded-full flex items-center justify-center ml-3 shrink-0
             ${
               message.trim() && socketConnected
                 ? "bg-red-500 shadow-md cursor-pointer"

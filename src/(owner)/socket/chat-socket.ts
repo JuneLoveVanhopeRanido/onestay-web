@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import io, { Socket } from "socket.io-client";
 import { getToken, getCurrentUser } from "../../api/request";
-import { API_BASE_URL } from "../types/auth";
-import { chatService } from "../../api/chat";
+import { API_BASE_URL } from "../../api/client";
 
 export interface OwnerChat {
   _id: string;

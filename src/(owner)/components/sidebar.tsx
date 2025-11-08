@@ -2,8 +2,6 @@ import {
   LayoutDashboardIcon,
   MessageCircleWarning,
   Users,
-  ContactIcon,
-  Home,
   UserCircle,
   LogOut,
   MessageCircle,
@@ -36,7 +34,7 @@ export default function Sidebar() {
       href: "/reports",
     },
     {
-      label: "Guest Management",
+      label: "Guests",
       icon: Users,
       href: "/guests",
     },

@@ -19,6 +19,7 @@ import {
 } from "recharts";
 import { usePDF } from "react-to-pdf";
 import { AlertCircle, Inbox, ListFilter, Download } from "lucide-react";
+import { PDFReportLayout } from "./components/pdf_layout";
 
 // --- Helper Components ---
 
@@ -138,11 +139,38 @@ export default function ReportsScreen() {
     }));
   }, [reservations]);
 
+  const detailedSalesData = useMemo(() => {
+    const salesByMonth: {
+      [month: string]: { roomType: string; price: number; id: string }[];
+    } = {};
+
+    reservations.forEach((reservation) => {
+      if (
+        reservation.status === "approved" ||
+        reservation.status === "completed"
+      ) {
+        const monthIndex = dayjs(reservation.start_date).month();
+        const monthName = allMonths[monthIndex];
+
+        if (!salesByMonth[monthName]) {
+          salesByMonth[monthName] = [];
+        }
+
+        salesByMonth[monthName].push({
+          id: reservation._id,
+          roomType: reservation.room_id_populated?.room_type || "N/A",
+          price: reservation.total_price,
+        });
+      }
+    });
+    return salesByMonth;
+  }, [reservations]);
+
   // --- Effects ---
 
   useEffect(() => {
     fetchReservations();
-  }, [fetchReservations]); // Runs on mount and when selectedFilter changes
+  }, [fetchReservations]);
 
   // --- Render Logic ---
 
@@ -160,7 +188,7 @@ export default function ReportsScreen() {
     }
 
     return (
-      <div className="flex flex-col gap-12" ref={targetRef}>
+      <div className="flex flex-col gap-12">
         <div className="flex flex-col gap-4">
           <h2 className="text-2xl font-bold">
             Monthly Sales (Confirmed/Completed)
@@ -266,6 +294,14 @@ export default function ReportsScreen() {
           {renderContent()}
         </div>
       </div>
+      <PDFReportLayout
+          ref={targetRef}
+          monthlySalesData={monthlySalesData}
+          detailedSalesData={detailedSalesData}
+          roomTypeData={roomTypeData}
+          filter={selectedFilter}
+          colors={COLORS}
+        />
     </main>
   );
 }

@@ -43,18 +43,4 @@ export const authAPI = {
       throw new Error(error instanceof Error ? error.message : "Login failed");
     }
   },
-
-  register: async (userData: RegisterData): Promise<RegisterResponse> => {
-    try {
-      const response = await apiRequest("/auth/register", {
-        method: "POST",
-        body: JSON.stringify(userData),
-      });
-      return response;
-    } catch (error) {
-      throw new Error(
-        error instanceof Error ? error.message : "Registration failed"
-      );
-    }
-  },
 };

@@ -1,7 +1,6 @@
 import axios from "axios";
 import { API_BASE_URL } from "./client";
 
-// Enhanced resort interface with customer data
 export interface EnhancedResort {
   _id: string;
   resort_name: string;

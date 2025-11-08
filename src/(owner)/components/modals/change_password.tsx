@@ -1,7 +1,7 @@
-import React, { useState, useEffect, type FormEvent } from "react";
+import { useState, useEffect, type FormEvent } from "react";
 import { X, Lock, Eye, EyeOff, AlertCircle, CheckCircle } from "lucide-react";
-import { useAuthStore } from "../../(auth)/store/Auth";
-import { userAPI } from "../../api/user";
+import { useAuthStore } from "../../../(auth)/store/Auth";
+import { userAPI } from "../../../api/user";
 
 interface ChangePasswordModalProps {
   isOpen: boolean;
