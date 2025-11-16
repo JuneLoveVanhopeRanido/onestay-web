@@ -360,8 +360,7 @@ export default function DashboardScreen() {
   return (
     <main className="relative flex flex-col gap-2 lg:grid grid-cols-[0.3fr_1fr] 2xl:grid-cols-[0.2fr_1fr] h-dvh bg-base-100">
       <Sidebar />
-      <MobilePlaceHolder />
-      <div className="hidden lg:flex flex-col gap-8 p-12 overflow-y-auto">
+      <div className="flex flex-col gap-8 p-12 overflow-y-auto">
         <div className="flex flex-row items-center justify-between">
           <h1 className="lg:text-4xl font-bold">Dashboard</h1>
           <button
