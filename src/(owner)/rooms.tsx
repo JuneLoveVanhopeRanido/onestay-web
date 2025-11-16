@@ -123,7 +123,7 @@ export default function RoomsScreen() {
 
   return (
     <>
-      <main className="relative grid grid-cols-[0.2fr_1fr] h-dvh bg-base-100">
+      <main className="relative grid grid-cols-[0.3fr_1fr] 2xl:grid-cols-[0.2fr_1fr] h-dvh bg-base-100">
         <Sidebar />
         <div className="flex flex-col gap-8 p-12 overflow-y-auto">
           <div className="flex flex-row items-center justify-between">

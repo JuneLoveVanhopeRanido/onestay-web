@@ -258,10 +258,8 @@ export default function CreateResortScreen() {
 
           {error && (
             <div className="alert alert-error shadow-lg">
-              <div>
                 <AlertCircle size={20} />
                 <span>{error}</span>
-              </div>
             </div>
           )}
 

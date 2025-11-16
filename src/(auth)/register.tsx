@@ -155,10 +155,8 @@ export default function RegisterScreen() {
 
         {error && (
           <div className="alert alert-error shadow-lg text-sm">
-            <div>
               <AlertCircle size={20} />
               <span>{error}</span>
-            </div>
           </div>
         )}
 
@@ -301,7 +299,7 @@ export default function RegisterScreen() {
         <p className="text-sm text-center mt-4">
           Already have an account?{" "}
           <Link
-            to={"/login"}
+            to={"/"}
             className="underline text-primary hover:text-primary-focus"
           >
             Log in

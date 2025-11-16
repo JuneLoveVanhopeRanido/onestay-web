@@ -72,11 +72,9 @@ export default function LoginScreen() {
         </div>
 
         {error && (
-          <div className="alert alert-error shadow-lg text-sm">
-            <div>
+          <div className="gap-2 alert alert-error shadow-lg text-sm">
               <AlertCircle size={20} />
               <span>{error}</span>
-            </div>
           </div>
         )}
 

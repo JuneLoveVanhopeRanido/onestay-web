@@ -361,7 +361,7 @@ export default function DashboardScreen() {
   };
 
   return (
-    <main className="relative grid grid-cols-[0.2fr_1fr] h-dvh bg-base-100">
+    <main className="relative grid grid-cols-[0.3fr_1fr] 2xl:grid-cols-[0.2fr_1fr] h-dvh bg-base-100">
       <Sidebar />
       <div className="flex flex-col gap-8 p-12 overflow-y-auto">
         <div className="flex flex-row items-center justify-between">
@@ -420,14 +420,14 @@ export default function DashboardScreen() {
         />
 
         {loadingStats ? (
-          <div className="grid grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 2xl:grid-cols-4 gap-4">
             <div className="skeleton h-28 rounded-xl"></div>
             <div className="skeleton h-28 rounded-xl"></div>
             <div className="skeleton h-28 rounded-xl"></div>
             <div className="skeleton h-28 rounded-xl"></div>
           </div>
         ) : (
-          <div className="grid grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 2xl:grid-cols-4 gap-4">
             <div className="stat bg-base-200 rounded-xl shadow">
               <div className="stat-title">Avg. Rating</div>
               <div className="stat-value text-secondary">
@@ -464,8 +464,7 @@ export default function DashboardScreen() {
         <div className="flex flex-col gap-4">
           <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
             <h1 className="text-2xl font-bold">Total reservations</h1>
-
-            <div className="flex flex-col md:flex-row gap-6">
+            <div className="hidden 2xl:flex flex-col md:flex-row gap-6">
               <label className="flex items-center gap-2">
                 <ListFilter size={16} className="opacity-70" />
                 <select
@@ -515,6 +514,56 @@ export default function DashboardScreen() {
                 <Search size={16} />
               </button>
             </div>
+          </div>
+          <div className="hidden 2xl:flex flex-col md:flex-row gap-6">
+            <label className="flex items-center gap-2">
+              <ListFilter size={16} className="opacity-70" />
+              <select
+                className="select select-bordered select-sm w-40"
+                value={selectedFilter}
+                onChange={(e) => setSelectedFilter(e.target.value)}
+              >
+                <option value="All">All Statuses</option>
+                <option value="pending">Pending</option>
+                <option value="confirmed">Confirmed</option>
+                <option value="cancelled">Cancelled</option>
+                <option value="completed">Completed</option>
+              </select>
+            </label>
+
+            <label className="flex items-center gap-2">
+              <CalendarIcon size={16} className="opacity-70" />
+              <select
+                id="month-select"
+                value={selectedMonth}
+                onChange={(e) => setSelectedMonth(e.target.value)}
+                className="select select-bordered select-sm w-40"
+              >
+                <option value={"All"}>All Months</option>
+                {allMonths.map((monthName) => (
+                  <option key={monthName} value={monthName}>
+                    {monthName}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className="input input-bordered input-sm flex items-center gap-2">
+              <input
+                type="search"
+                className="grow"
+                placeholder="Search..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && fetchReservations()}
+              />
+            </label>
+            <button
+              className="btn btn-sm btn-primary"
+              onClick={() => fetchReservations()}
+            >
+              <Search size={16} />
+            </button>
           </div>
 
           <div className="flex flex-col gap-4 p-4 rounded-xl bg-base-200 shadow-sm">

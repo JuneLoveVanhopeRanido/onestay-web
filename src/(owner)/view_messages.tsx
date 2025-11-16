@@ -336,7 +336,7 @@ export default function OwnerChatConversation() {
   }
 
   return (
-    <main className="grid grid-cols-[0.2fr_1fr] h-dvh">
+    <main className="grid grid-cols-[0.3fr_1fr] 2xl:grid-cols-[0.2fr_1fr] h-dvh">
       <Sidebar />
       <div className="flex flex-col h-dvh bg-white">
         {errorAlert && (
