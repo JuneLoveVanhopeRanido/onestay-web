@@ -26,7 +26,6 @@ import ResortScreenMaps from "./components/maps";
 import { Link } from "react-router";
 import EditResortModal from "./components/modals/edit_resort";
 import type { Resort } from "../api/resort";
-import MobilePlaceHolder from "./components/mobile_placeholder";
 
 const LoadingSpinner = ({
   size = "lg",
