@@ -14,6 +14,7 @@ export interface Feedback {
   from_user_id: any;
   to_user_id: string;
   room_id: string;
+  room_name: string;
   reservation_id: string;
   feedback_type: "customer_to_owner" | "owner_to_customer";
   rating: number;

@@ -346,20 +346,31 @@ export default function DashboardScreen() {
         return;
       }
 
+      const roomMap = new Map<string, string>();
+      rooms.forEach((room) => {
+        roomMap.set(room._id, room.room_type);
+      });
+
       const feedbackPromises = rooms.map((room) =>
         feedbackAPI.getRoomFeedbacks(room._id)
       );
 
       const allFeedbackResponses = await Promise.all(feedbackPromises);
 
-      const allFeedbacks = allFeedbackResponses.flatMap((res) => res.feedbacks);
+      const allFeedbacks = allFeedbackResponses
+        .flatMap((res) => res.feedbacks)
+        .map((fb) => ({
+          ...fb,
+          // Manually add the room_name using the map
+          room_name: roomMap.get(fb.room_id) || "Unknown Room",
+        }));
 
       allFeedbacks.sort(
         (a, b) =>
           new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
       );
 
-      setRecentFeedbacks(allFeedbacks.slice(0, 10));
+      setRecentFeedbacks(allFeedbacks.slice(0, 10) as Feedback[]);
     } catch (error: any) {
       console.error("Error loading recent feedbacks:", error);
       setFeedbacksError(error.message || "Failed to load feedback");
@@ -660,40 +671,42 @@ export default function DashboardScreen() {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {recentFeedbacks.map((feedback) => {
-                    return (
-                      <div
-                        key={feedback._id}
-                        className="card bg-base-100 shadow-sm"
-                      >
-                        <div className="card-body p-4">
-                          <div className="flex items-center justify-between mb-2">
-                            <div className="flex items-center gap-3">
-                              <div className="avatar placeholder">
-                                <div className="bg-neutral text-neutral-content rounded-full w-10">
-                                  <span>
-                                    {feedback.from_user_id.username
-                                      .substring(0, 1)
-                                      .toUpperCase()}
-                                  </span>
-                                </div>
+                  {recentFeedbacks.map((feedback) => (
+                    <div
+                      key={feedback._id}
+                      className="card bg-base-100 shadow-sm"
+                    >
+                      <div className="card-body p-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-3">
+                            <div className="avatar placeholder">
+                              <div className="bg-neutral text-neutral-content rounded-full w-10">
+                                <span>
+                                  {feedback.from_user_id.username
+                                    .substring(0, 1)
+                                    .toUpperCase()}
+                                </span>
                               </div>
-                              <span className="font-bold">
-                                {feedback.from_user_id.username}
-                              </span>
                             </div>
-                            {renderStars(feedback.rating)}
+                            <span className="font-bold">
+                              {feedback.from_user_id.username}
+                            </span>
+                            <span className="badge badge-sm badge-neutral self-center">
+                              {feedback.room_name || "Unknown Room"}
+                            </span>
                           </div>
-                          <p className="text-base-content/90 italic">
-                            "{feedback.comment}"
-                          </p>
-                          <span className="text-xs text-base-content/50 mt-1">
-                            {dayjs(feedback.createdAt).format("MMM DD, YYYY")}
-                          </span>
+                          {renderStars(feedback.rating)}
                         </div>
+
+                        <p className="text-base-content/90 italic mt-2">
+                          "{feedback.comment}"
+                        </p>
+                        <span className="text-xs text-base-content/50 mt-1">
+                          {dayjs(feedback.createdAt).format("MMM DD, YYYY")}
+                        </span>
                       </div>
-                    );
-                  })}
+                    </div>
+                  ))}
                 </div>
               )}
             </div>
