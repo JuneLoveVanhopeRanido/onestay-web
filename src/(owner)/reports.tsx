@@ -18,7 +18,13 @@ import {
   YAxis,
 } from "recharts";
 import { usePDF } from "react-to-pdf";
-import { AlertCircle, Inbox, ListFilter, Download } from "lucide-react";
+import {
+  AlertCircle,
+  Inbox,
+  ListFilter,
+  Download,
+  ChevronDown,
+} from "lucide-react";
 import { PDFReportLayout } from "./components/pdf_layout";
 
 const LoadingComponent = () => (
@@ -58,8 +64,11 @@ const EmptyComponent = () => (
 
 export default function ReportsScreen() {
   const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#AF19FF"];
+  const [pdfFilename, setPdfFilename] = useState(
+    `report-${dayjs().format("YYYY-MM-DD")}.pdf`
+  );
   const { toPDF, targetRef } = usePDF({
-    filename: `report-${dayjs(new Date()).format("YYYY-MM-DD")}.pdf`,
+    filename: pdfFilename,
   });
 
   const [selectedFilter, setSelectedFilter] = useState("All");
@@ -67,9 +76,35 @@ export default function ReportsScreen() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const [pdfFilterMonth, setPdfFilterMonth] = useState("All");
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+
   useEffect(() => {
     document.title = "OneStay / Reports";
   }, []);
+
+  useEffect(() => {
+    if (isGeneratingPdf) {
+      const timeout = setTimeout(() => {
+        toPDF();
+        setIsGeneratingPdf(false);
+      }, 500);
+      return () => clearTimeout(timeout);
+    }
+  }, [isGeneratingPdf, toPDF]);
+
+  const handleExportPDF = (month: string) => {
+    setPdfFilterMonth(month);
+    setPdfFilename(
+      `OneStay_Report_${month}_${dayjs().format("YYYY-MM-DD")}.pdf`
+    );
+    setIsGeneratingPdf(true);
+
+    const elem = document.activeElement as HTMLElement;
+    if (elem) {
+      elem.blur();
+    }
+  };
 
   const fetchReservations = useCallback(async () => {
     try {
@@ -87,7 +122,6 @@ export default function ReportsScreen() {
         sortOrder: "desc",
       });
 
-      console.log(response.reservations);
       setReservations(response.reservations || []);
     } catch (error: any) {
       const errorMessage = error.message || "An unknown error occurred";
@@ -109,7 +143,7 @@ export default function ReportsScreen() {
         reservation.status === "approved" ||
         reservation.status === "completed"
       ) {
-        const monthIndex = dayjs(reservation.start_date).month(); // 0-11
+        const monthIndex = dayjs(reservation.start_date).month();
         salesData[monthIndex].sales += reservation.total_price;
       }
     });
@@ -133,12 +167,45 @@ export default function ReportsScreen() {
     }));
   }, [reservations]);
 
-  const detailedSalesData = useMemo(() => {
+  const pdfData = useMemo(() => {
+    const filteredReservations = reservations.filter((r) => {
+      if (pdfFilterMonth === "All") return true;
+      const rMonthIndex = dayjs(r.start_date).month();
+      const targetMonthIndex = allMonths.indexOf(pdfFilterMonth);
+      return rMonthIndex === targetMonthIndex;
+    });
+
+    const salesData = allMonths.map((month) => ({
+      month: month.substring(0, 3),
+      sales: 0,
+    }));
+
+    filteredReservations.forEach((reservation) => {
+      if (
+        reservation.status === "approved" ||
+        reservation.status === "completed"
+      ) {
+        const monthIndex = dayjs(reservation.start_date).month();
+        salesData[monthIndex].sales += reservation.total_price;
+      }
+    });
+
+    const roomCounts: { [key: string]: number } = {};
+    filteredReservations.forEach((reservation) => {
+      const roomType = reservation.room_id_populated?.room_type;
+      if (roomType) {
+        roomCounts[roomType] = (roomCounts[roomType] || 0) + 1;
+      }
+    });
+    const roomData = Object.entries(roomCounts).map(([name, value]) => ({
+      name,
+      value,
+    }));
+
     const salesByMonth: {
       [month: string]: { roomType: string; price: number; id: string }[];
     } = {};
-
-    reservations.forEach((reservation) => {
+    filteredReservations.forEach((reservation) => {
       if (
         reservation.status === "approved" ||
         reservation.status === "completed"
@@ -157,25 +224,19 @@ export default function ReportsScreen() {
         });
       }
     });
-    return salesByMonth;
-  }, [reservations]);
+
+    return { salesData, roomData, salesByMonth };
+  }, [reservations, pdfFilterMonth]);
 
   useEffect(() => {
     fetchReservations();
   }, [fetchReservations]);
 
   const renderContent = () => {
-    if (loading) {
-      return <LoadingComponent />;
-    }
-
-    if (error) {
+    if (loading) return <LoadingComponent />;
+    if (error)
       return <ErrorComponent message={error} onRetry={fetchReservations} />;
-    }
-
-    if (reservations.length === 0) {
-      return <EmptyComponent />;
-    }
+    if (reservations.length === 0) return <EmptyComponent />;
 
     return (
       <div className="flex flex-col gap-12">
@@ -185,7 +246,7 @@ export default function ReportsScreen() {
           </h2>
           <p className="text-sm -mt-3 text-base-content/70">
             This chart shows total sales from confirmed and completed
-            reservations for the year.
+            reservations.
           </p>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart
@@ -207,7 +268,7 @@ export default function ReportsScreen() {
         <div className="flex flex-col gap-4">
           <h2 className="text-2xl font-bold">Reservations by Room Type</h2>
           <p className="text-sm -mt-3 text-base-content/70">
-            This chart shows the breakdown of reservations based on the status:
+            This chart shows the breakdown of reservations based on status:
             <span className="font-bold p-1 bg-base-300 rounded-md mx-1">
               {selectedFilter}
             </span>
@@ -234,7 +295,7 @@ export default function ReportsScreen() {
               <Tooltip
                 formatter={(value: number, name: string) => [
                   value,
-                  `${name} reservations`,
+                  `${name} bookings`,
                 ]}
               />
               <Legend />
@@ -246,19 +307,48 @@ export default function ReportsScreen() {
   };
 
   return (
-    <main className="grid grid-cols-[0.3fr_1fr] 2xl:grid-cols-[0.2fr_1fr] h-dvh bg-base-100">
+    <main className="grid grid-cols-[0.2fr_1fr] h-dvh bg-base-100">
       <Sidebar />
       <div className="flex flex-col gap-6 p-12 overflow-y-auto">
         <div className="flex flex-row items-center justify-between">
           <h1 className="lg:text-4xl font-bold">Reports</h1>
-          <button
-            className="btn btn-primary"
-            onClick={() => toPDF()}
-            disabled={loading || !!error}
-          >
-            <Download size={18} />
-            Export as PDF
-          </button>
+
+          <div className="join">
+            <button
+              className="btn btn-primary join-item"
+              onClick={() => handleExportPDF("All")}
+              disabled={loading || !!error || isGeneratingPdf}
+            >
+              {isGeneratingPdf && pdfFilterMonth === "All" ? (
+                <span className="loading loading-spinner loading-xs"></span>
+              ) : (
+                <Download size={18} />
+              )}
+              Export PDF
+            </button>
+            <div className="dropdown dropdown-end join-item">
+              <div
+                tabIndex={0}
+                role="button"
+                className="btn btn-primary join-item"
+              >
+                <ChevronDown size={18} />
+              </div>
+              <ul
+                tabIndex={0}
+                className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52 max-h-96 overflow-y-auto"
+              >
+                <li key="all">
+                  <a onClick={() => handleExportPDF("All")}>All Months</a>
+                </li>
+                {allMonths.map((month) => (
+                  <li key={month}>
+                    <a onClick={() => handleExportPDF(month)}>{month}</a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
         </div>
 
         <div className="flex flex-row gap-4 items-center">
@@ -284,12 +374,13 @@ export default function ReportsScreen() {
           {renderContent()}
         </div>
       </div>
+
       <PDFReportLayout
         ref={targetRef}
-        monthlySalesData={monthlySalesData}
-        detailedSalesData={detailedSalesData}
-        roomTypeData={roomTypeData}
-        filter={selectedFilter}
+        monthlySalesData={pdfData.salesData}
+        roomTypeData={pdfData.roomData}
+        detailedSalesData={pdfData.salesByMonth}
+        filterMonth={pdfFilterMonth}
         colors={COLORS}
       />
     </main>
