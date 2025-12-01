@@ -1,7 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState, useEffect, type FormEvent } from "react";
-import { X, AlertCircle, Home, Check } from "lucide-react";
-import { type Room, type UpdateRoomData, roomAPI } from "../../../api/room";
+import { useState, useRef, useEffect, type FormEvent } from "react";
+import { X, AlertCircle, Home, Check, Camera } from "lucide-react";
+
+import { type Room, type RoomFormData, type UpdateRoomData, roomAPI } from "../../../api/room";
+
+import { useAuthStore } from "../../../(auth)/store/Auth";
 
 const ROOM_TYPES = [
   "Standard Room",
@@ -33,6 +36,13 @@ export default function EditRoomModal({
   onSuccess,
   roomToEdit,
 }: EditRoomModalProps) {
+
+  const { token } = useAuthStore();
+
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const [formData, setFormData] = useState<UpdateRoomData>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -47,8 +57,21 @@ export default function EditRoomModal({
       });
       setError(null);
       setIsSubmitting(false);
+
+      setImagePreview(roomToEdit.image || null);
+      setSelectedFile(null);
+      setError(null);
+      setIsSubmitting(false);
     }
   }, [isOpen, roomToEdit]);
+
+  useEffect(() => {
+    return () => {
+      if (imagePreview && selectedFile) {
+        URL.revokeObjectURL(imagePreview);
+      }
+    };
+  }, [imagePreview, selectedFile]);
 
   const handleInputChange = (
     field: keyof UpdateRoomData,
@@ -58,6 +81,24 @@ export default function EditRoomModal({
       ...prev,
       [field]: value,
     }));
+  };
+
+  const handleImagePick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+      const previewUrl = URL.createObjectURL(file);
+      setImagePreview(previewUrl);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setSelectedFile(null);
+    setImagePreview(null);
   };
 
   const validateForm = (): boolean => {
@@ -84,9 +125,27 @@ export default function EditRoomModal({
     setIsSubmitting(true);
     setError(null);
     try {
-      const result = await roomAPI.updateRoom(roomToEdit._id, formData);
+
+      const updateData: Partial<RoomFormData> = {
+        resort_id: roomToEdit.resort_id,
+        description: formData.description,
+        room_type:formData.room_type,
+        capacity: formData.capacity,
+        price_per_night:formData.price_per_night,
+        status: formData.status,
+      };
+
+      const result = await roomAPI.updateRoomV2(
+        roomToEdit._id,
+        updateData,
+        selectedFile,
+        token!
+      );
+      
+      // const result = await roomAPI.updateRoom(roomToEdit._id, formData);
       onSuccess(result);
       onClose();
+
     } catch (err) {
       console.error("Error updating room:", err);
       setError(
@@ -123,7 +182,67 @@ export default function EditRoomModal({
           </div>
         )}
 
+          
+
         <div className="form-control mt-4 space-y-5">
+
+          <div className="flex flex-col gap-2">
+            <label className="label">
+              <span className="label-text font-medium">Resort Image</span>
+            </label>
+
+            {imagePreview ? (
+              <div className="relative w-full h-50">
+                <img
+                  src={imagePreview}
+                  alt="Resort preview"
+                  className="w-full h-full object-cover rounded-lg bg-base-200"
+                />
+                <button
+                  onClick={handleRemoveImage}
+                  className="btn btn-sm btn-circle absolute top-2 right-2"
+                  disabled={isSubmitting}
+                >
+                  <X size={16} />
+                </button>
+              </div>
+            ) : (
+              <div
+                className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-base-300 rounded-lg bg-base-200 cursor-pointer"
+                onClick={handleImagePick}
+              >
+                <Camera size={32} className="text-base-content/50" />
+                <span className="mt-2 text-sm text-base-content/70">
+                  Choose New Image
+                </span>
+                <span className="text-xs text-base-content/50">
+                  Tap to select from files
+                </span>
+              </div>
+            )}
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleImageChange}
+              className="hidden"
+              accept="image/png, image/jpeg"
+              disabled={isSubmitting}
+            />
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <label className="label">
+              <span className="label-text font-medium">Description</span>
+            </label>
+            <textarea
+              className="textarea textarea-bordered h-24 w-full resize-none"
+              placeholder="Describe your resort..."
+              value={formData.description}
+              onChange={(e) => handleInputChange("description", e.target.value)}
+              disabled={isSubmitting}
+            ></textarea>
+          </div>
+
           <div>
             <label className="label">
               <span className="label-text font-bold">Room Type</span>
@@ -234,6 +353,7 @@ export default function EditRoomModal({
             </div>
           </div>
         </div>
+
 
         <div className="modal-action mt-6">
           <button

@@ -4,12 +4,13 @@ import { useCallback, useEffect, useState } from "react";
 import Sidebar from "./components/sidebar";
 import { roomAPI, type Room } from "../api/room";
 import { feedbackAPI } from "../api/feedback";
-import { Users, Star, AlertCircle, Inbox, Edit, Trash2 } from "lucide-react";
+import { Users, Star, AlertCircle, Inbox, Edit, Trash2, CircleChevronLeft } from "lucide-react";
 import dayjs from "dayjs";
 import type { PaginationInfo } from "../api/reservation";
 import { useNavigate, useParams } from "react-router";
 import DeleteConfirmationModal from "./components/modals/delete_amenity";
 import EditRoomModal from "./components/modals/edit_room";
+import { Link } from "react-router";
 
 interface FeedbackUser {
   _id: string;
@@ -116,7 +117,7 @@ export default function ViewRoomScreen() {
         setPagination(feedbackData.pagination);
         setCurrentPage(page);
 
-        console.log(roomData);
+        console.log("test", roomData);
         console.log(feedbackData);
       } catch (error: any) {
         console.error("Error fetching room data:", error);
@@ -194,25 +195,48 @@ export default function ViewRoomScreen() {
 
     return (
       <div className="flex flex-col gap-8 p-12 overflow-y-auto">
+        <div className="flex items-center">
+          <Link to={`/view/rooms-type/${params.id}/${room.room_type}`} className="flex items-center gap-1 text-primary">
+            <CircleChevronLeft size={24} className="opacity-70" />
+            <span className="lg:text-2xl font-bold">Back</span>
+          </Link>
+        </div>
         <div className="flex flex-row items-center justify-between">
+
           <div className="flex flex-col gap-2">
-            <h2 className="text-4xl font-bold">{room.room_type}</h2>
-            <div className="flex flex-row gap-2 items-center">
-              <div className="flex flex-row gap-2 items-center badge badge-neutral badge-lg">
-                <Users size={16} className="opacity-70" />
-                <p>{room.capacity} guests</p>
+
+            <div className="flex flex-row gap-6 ">
+
+              <div className="flex flex-col">
+                  <img
+                  className="w-64 aspect-video rounded-xl object-cover shadow-md"
+                  src={room.image}
+                  alt={room.room_type}
+                />
               </div>
-              <h3 className="badge badge-neutral badge-lg">
-                ₱{room.price_per_night.toLocaleString()}/night
-              </h3>
-              <h3
-                className={`badge badge-lg ${
-                  room.status === "available" ? "badge-success" : "badge-error"
-                }`}
-              >
-                {room.status}
-              </h3>
-            </div>
+              <div className="flex flex-col gap-2">
+                  <h2 className="text-4xl font-bold">{room.room_type}</h2>
+                  <div className="flex flex-row gap-2 items-center">
+                    <div className="flex flex-row gap-2 items-center badge badge-neutral badge-lg">
+                      <Users size={16} className="opacity-70" />
+                      <p>{room.capacity} guests</p>
+                    </div>
+                    <h3 className="badge badge-neutral badge-lg">
+                      ₱{room.price_per_night.toLocaleString()}/night
+                    </h3>
+                    <h3
+                      className={`badge badge-lg ${
+                        room.status === "available" ? "badge-success" : "badge-error"
+                      }`}
+                    >
+                      {room.status}
+                      
+                    </h3>
+                  </div>
+                  
+                  <p  className="text-base-content/70">{room.description}</p>
+                </div>
+              </div>
           </div>
           <div className="flex gap-2">
             <button

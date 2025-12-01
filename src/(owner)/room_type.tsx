@@ -3,15 +3,26 @@ import { useEffect, useState, useCallback } from "react";
 import { type Room, roomAPI } from "../api/room";
 import Sidebar from "./components/sidebar";
 import { useResortStore } from "./store/resort";
-import { Users, Plus, AlertCircle, Inbox, CircleChevronLeft } from "lucide-react";
+import { Users, Plus, AlertCircle, Inbox, BedDouble, Building  } from "lucide-react";
 import CreateRoomModal from "./components/modals/add_room";
-import { Link,useParams } from "react-router";
+import { Link } from "react-router";
 
 const LoadingComponent = () => (
   <div className="flex justify-center items-center col-span-full h-64">
     <div className="loading loading-spinner loading-lg text-primary"></div>
   </div>
 );
+
+const ROOM_TYPES = [
+  "Standard Room",
+  "Deluxe Room",
+  "Suite",
+  "Family Room",
+  "Presidential Suite",
+  "Villa",
+  "Cabin",
+  "Bungalow",
+];
 
 const ErrorComponent = ({
   message,
@@ -44,13 +55,12 @@ const EmptyComponent = () => (
   </div>
 );
 
-export default function RoomsScreen() {
-  
-  const { room_type } = useParams();
+export default function RoomType() {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [roomCount, setRoomCount] = useState<Record<string, number>>({});
 
   const { resorts, hasResorts, loading: resortsLoading } = useResortStore();
   const currentResortId = hasResorts ? resorts[0]._id : null;
@@ -69,21 +79,30 @@ export default function RoomsScreen() {
       setLoading(true);
       setError(null);
       const response = await roomAPI.getRoomsByResort(currentResortId);
-      const filteredRoom = response.rooms.filter(room => room.room_type == room_type);
-      setRooms(filteredRoom);
-      console.log('death',response);
+      setRooms(response.rooms);
+      console.log(response);
+
+      const grouped = response.rooms.reduce((acc: Record<string, number>, item) => {
+        const key = item.room_type; // <-- the value to group by
+        acc[key] = (acc[key] || 0) + 1;
+        return acc;
+      }, {});
+      setRoomCount(grouped)
+      console.log('group',grouped);
+
+
+
+
     } catch (error: any) {
       console.error("Error fetching rooms:", error);
       setError(error.message || "An unknown error occurred.");
     } finally {
       setLoading(false);
     }
-  }, [currentResortId,room_type]);
+  }, [currentResortId]);
 
   useEffect(() => {
-
     fetchRooms();
-
   }, [fetchRooms]);
 
   const handleCreateSuccess = (newRoom: Room) => {
@@ -102,24 +121,25 @@ export default function RoomsScreen() {
       return <EmptyComponent />;
     }
 
-    return rooms.map((room) => (
+    return ROOM_TYPES.map((room) => (
       <Link
-        to={`/view/rooms/${room._id}`}
-        key={room._id}
+        to={`/view/rooms-type/${currentResortId}/${room}`}
+        key={room}
         className="card bg-base-200 shadow-sm"
       >
         <div className="card-body">
-          <h2 className="card-title">{room.room_type}</h2>
+          <h2 className="card-title">
+            <Building size={16} className="opacity-70" />{room}</h2>
           <div className="flex flex-row gap-4 items-center">
-            <Users size={16} className="opacity-70" />
-            <p>{room.capacity} guests</p>
+            <BedDouble size={16} className="opacity-70" />
+            <p>{roomCount[room]} Rooms</p>
           </div>
           <div className="divider my-1" />
           <div className="flex flex-row items-center justify-between">
             <h3 className="font-bold text-lg">
-              ₱{room.price_per_night.toLocaleString()}/night
+              {/* ₱{room.price_per_night.toLocaleString()}/night */}
             </h3>
-            <div className="badge badge-primary">{room.status}</div>
+            {/* <div className="badge badge-primary">{room.status}</div> */}
           </div>
         </div>
       </Link>
@@ -132,14 +152,15 @@ export default function RoomsScreen() {
         <Sidebar />
         <div className="flex flex-col gap-8 p-12 overflow-y-auto">
           <div className="flex flex-row items-center justify-between">
-            <div className="flex flex-row items-center gap-2 justify-between">
-              <Link
-                to={`/rooms`}
-              >
-                <CircleChevronLeft size={30} className="opacity-70 text-primary" />
-              </Link>
-              <h1 className="lg:text-4xl font-bold">{room_type}s</h1></div>
-            
+            <h1 className="lg:text-4xl font-bold">Rooms</h1>
+            <button
+              className="btn btn-primary"
+              onClick={() => setIsModalOpen(true)}
+              disabled={!hasResorts || loading}
+            >
+              <Plus size={18} />
+              Add room
+            </button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {renderContent()}

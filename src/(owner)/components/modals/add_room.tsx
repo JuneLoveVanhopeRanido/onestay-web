@@ -1,6 +1,8 @@
-import { useState, useEffect } from "react";
-import { Home, Check, X, AlertCircle } from "lucide-react";
+import { useState, useEffect,  useRef, } from "react";
+import { Home, Check, X, AlertCircle,Camera, } from "lucide-react";
 import { roomAPI, type Room } from "../../../api/room";
+
+import { useAuthStore } from "../../../(auth)/store/Auth";
 
 interface CreateRoomFormData {
   resort_id: string;
@@ -8,6 +10,18 @@ interface CreateRoomFormData {
   capacity: number;
   price_per_night: number;
   status: string;
+  description:string;
+  image:string;
+}
+
+export interface RoomData {
+  resort_id: string;
+  room_type: string;
+  capacity: number;
+  price_per_night: number;
+  status: string;
+  description?:string;
+  image?: string;
 }
 
 const ROOM_TYPES = [
@@ -32,6 +46,8 @@ const INITIAL_FORM_STATE = {
   capacity: 2,
   price_per_night: 1000,
   status: "available",
+  description:"",
+  image:""
 };
 
 interface CreateRoomModalProps {
@@ -47,8 +63,13 @@ export default function CreateRoomModal({
   onSuccess,
   resortId,
 }: CreateRoomModalProps) {
+  const { token } = useAuthStore();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);  
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState<CreateRoomFormData>({
     ...INITIAL_FORM_STATE,
     resort_id: resortId,
@@ -64,6 +85,14 @@ export default function CreateRoomModal({
       setLoading(false);
     }
   }, [isOpen, resortId]);
+
+  useEffect(() => {
+    return () => {
+      if (imagePreview && selectedFile) {
+        URL.revokeObjectURL(imagePreview);
+      }
+    };
+  }, [imagePreview, selectedFile]);
 
   const handleInputChange = (
     field: keyof CreateRoomFormData,
@@ -99,12 +128,28 @@ export default function CreateRoomModal({
   const handleCreateRoom = async () => {
     if (!validateForm()) return;
 
+      if (!token) {
+    setError("Authentication failed. Please log in again.");
+    return;
+  }
+
     try {
       setLoading(true);
       setError(null);
+      
+      console.log("formData:", formData);
 
-      const newRoom = await roomAPI.createRoom(formData);
 
+       const roomData: RoomData = {
+        resort_id: formData.resort_id,
+        description: formData.description,
+        room_type:formData.room_type,
+        capacity: formData.capacity,
+        price_per_night:formData.price_per_night,
+        status: formData.status,
+      };
+
+      const newRoom = await roomAPI.createRoomV2(roomData,selectedFile,token);
       onSuccess(newRoom);
       onClose();
     } catch (error) {
@@ -115,6 +160,27 @@ export default function CreateRoomModal({
     } finally {
       setLoading(false);
     }
+
+    setIsSubmitting(false);
+    setError(null);
+  };
+
+  const handleImagePick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+      const previewUrl = URL.createObjectURL(file);
+      setImagePreview(previewUrl);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setSelectedFile(null);
+    setImagePreview(null);
   };
 
   return (
@@ -128,6 +194,63 @@ export default function CreateRoomModal({
         </div>
 
         <p className="text-base-content/70">Add a new room to your resort.</p>
+
+        <fieldset className="fieldset">
+                <legend className="fieldset-legend">Room Image</legend>
+                {imagePreview ? (
+                  <div className="relative w-full h-50">
+                    <img
+                      src={imagePreview}
+                      alt="Resort preview"
+                      className="w-full h-full object-cover rounded-lg bg-base-200"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleRemoveImage}
+                      className="btn btn-sm btn-circle btn-error absolute top-2 right-2"
+                      disabled={isSubmitting}
+                    >
+                      <X size={16} />
+                    </button>
+                  </div>
+                ) : (
+                  <div
+                    className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-base-300 rounded-lg bg-base-200 cursor-pointer hover:bg-base-300"
+                    onClick={handleImagePick}
+                  >
+                    <Camera size={32} className="text-base-content/50" />
+                    <span className="mt-2 text-sm text-base-content/70">
+                      Upload Room Image
+                    </span>
+                    <span className="text-xs text-base-content/50">
+                      (Optional)
+                    </span>
+                  </div>
+                )}
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleImageChange}
+                  className="hidden"
+                  accept="image/png, image/jpeg"
+                  disabled={isSubmitting}
+                />
+        </fieldset>
+
+
+
+        <fieldset className="fieldset">
+          <legend className="fieldset-legend">Description</legend>
+          <textarea
+            className="textarea textarea-bordered h-15 w-full resize-none"
+            placeholder="Tell guests about the Room..."
+            value={formData.description}
+            onChange={(e) =>
+              handleInputChange("description", e.target.value)
+            }
+            disabled={isSubmitting}
+          ></textarea>
+        </fieldset>
 
         {error && (
           <div className="alert alert-error shadow-lg mt-4">

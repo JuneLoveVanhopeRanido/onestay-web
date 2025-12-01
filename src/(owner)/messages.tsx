@@ -187,6 +187,8 @@ export default function ChatListScreen() {
   };
 
   const updateChatWithNewMessage = (message: ChatMessage) => {
+    
+   
     setChats((prevChats) => {
       const updatedChats = prevChats.map((chat) => {
         if (chat._id === message.chatId) {
@@ -200,8 +202,11 @@ export default function ChatListScreen() {
                 : chat.unread_count,
           };
         }
+        
+      console.log('chatsssss',chats);
         return chat;
       });
+
 
       return updatedChats.sort(
         (a, b) =>

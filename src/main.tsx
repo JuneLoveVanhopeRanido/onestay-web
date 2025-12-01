@@ -22,6 +22,7 @@ import "react-calendar/dist/Calendar.css";
 import ViewRoomScreen from "./(owner)/view_room";
 import CreateResortScreen from "./(owner)/create-resort";
 import RegisterScreen from "./(auth)/register";
+import RoomType from "./(owner)/room_type";
 
 const router = createBrowserRouter([
   {
@@ -105,7 +106,7 @@ const router = createBrowserRouter([
   },
   {
     path: "rooms",
-    Component: RoomsScreen,
+    Component: RoomType,
     loader: async () => {
       const { token } = useAuthStore.getState();
 
@@ -148,7 +149,7 @@ const router = createBrowserRouter([
     },
   },
   {
-    path: "view/room/:id",
+    path: "view/rooms/:id",
     Component: ViewRoomScreen,
     loader: async () => {
       const { token } = useAuthStore.getState();
@@ -161,6 +162,17 @@ const router = createBrowserRouter([
   {
     path: "settings",
     Component: SettingsScreen,
+    loader: async () => {
+      const { token } = useAuthStore.getState();
+
+      if (!token) {
+        return redirect("/");
+      }
+    },
+  },
+  {
+    path: "view/rooms-type/:id/:room_type",
+    Component: RoomsScreen,
     loader: async () => {
       const { token } = useAuthStore.getState();
 
