@@ -1,7 +1,7 @@
 import { getToken } from "./request";
 
 // API base URL from environment variables
-export const API_BASE_URL = "https://one-stay-server.onrender.com/api";
+export const API_BASE_URL = "http://localhost:3000/api";
 
 // Default headers for API requests
 export const defaultHeaders = {

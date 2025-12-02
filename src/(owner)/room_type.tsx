@@ -3,7 +3,7 @@ import { useEffect, useState, useCallback } from "react";
 import { type Room, roomAPI } from "../api/room";
 import Sidebar from "./components/sidebar";
 import { useResortStore } from "./store/resort";
-import { Users, Plus, AlertCircle, Inbox, BedDouble, Building  } from "lucide-react";
+import { Plus, AlertCircle, Inbox, BedDouble, Building  } from "lucide-react";
 import CreateRoomModal from "./components/modals/add_room";
 import { Link } from "react-router";
 

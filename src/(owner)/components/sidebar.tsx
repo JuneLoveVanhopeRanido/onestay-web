@@ -13,8 +13,6 @@ import { useLocation, useNavigate } from "react-router";
 import { useAuthStore } from "../../(auth)/store/Auth";
 import clsx from "clsx";
 
-
-import {type OwnerChat} from "../socket/chat-socket";
 import { useResortStore } from "../store/resort";
 import { chatService } from "../../api/chat";
 
@@ -29,10 +27,6 @@ export default function Sidebar() {
   const [unreadCount, setUnreadCount] = useState(0);
 
   const { resorts, loading: resortsLoading, hasResorts } = useResortStore();
-  const [errorAlert, setErrorAlert] = useState<{
-      title: string;
-      message: string;
-  } | null>(null);
 
 
     const loadChats = async () => {
@@ -75,12 +69,7 @@ export default function Sidebar() {
         console.log("Transformed chatssss:", transformedChats);
       } catch (error) {
         console.error("Error loading chats:", error);
-        setErrorAlert({
-          title: "Error",
-          message: `Failed to load chats: ${
-            error instanceof Error ? error.message : "Unknown error"
-          }`,
-        });
+        
       }
     };
 
