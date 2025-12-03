@@ -3,7 +3,7 @@ import Sidebar from "./components/sidebar";
 import { useEffect, useState, useCallback } from "react";
 import { reservationAPI, type Reservation } from "../api/reservation";
 import dayjs from "dayjs";
-import { AlertCircle, Check, ThumbsDown, X } from "lucide-react";
+import { AlertCircle, Check, X } from "lucide-react";
 import { getStatusColor } from "./helpers/ui";
 import { useParams } from "react-router";
 
@@ -272,7 +272,7 @@ export default function ViewReservationScreen() {
 
             {reservation.status === "pending" && (
               <>
-                <button
+                {/* <button
                   className="btn btn-error flex-1"
                   onClick={() => handleUpdateStatus("rejected")}
                   disabled={isSubmitting}
@@ -283,7 +283,7 @@ export default function ViewReservationScreen() {
                     <ThumbsDown size={18} />
                   )}
                   Reject Reservation
-                </button>
+                </button> */}
                 <button
                   className="btn btn-success flex-1"
                   onClick={() => handleUpdateStatus("approved")}
