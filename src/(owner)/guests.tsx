@@ -141,6 +141,11 @@ export default function GuestsScreen() {
     setCurrentPage(1);
     fetchReservations();
   };
+  
+  const displayStatus = (status: string) => {
+    if (status === "rejected") return "Cancelled";
+    return status.toUpperCase();
+  };
 
   const renderContent = () => {
     if (loading) {
@@ -189,7 +194,7 @@ export default function GuestsScreen() {
                         color: getStatusColor(reservation.status),
                       }}
                     >
-                      {reservation.status.toUpperCase()}
+                      {displayStatus(reservation.status)}
                     </span>
                   </td>
                   <td className="text-right">
@@ -221,6 +226,7 @@ export default function GuestsScreen() {
       </>
     );
   };
+
 
   return (
     <main className="grid grid-cols-[0.3fr_1fr] 2xl:grid-cols-[0.2fr_1fr] h-dvh bg-base-100">
