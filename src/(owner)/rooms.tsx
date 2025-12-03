@@ -109,7 +109,7 @@ export default function RoomsScreen() {
         className="card bg-base-200 shadow-sm"
       >
         <div className="card-body">
-          <h2 className="card-title">{room.room_type}</h2>
+          <h2 className="card-title">{room.room_type} {room.room_number}</h2>
           <div className="flex flex-row gap-4 items-center">
             <Users size={16} className="opacity-70" />
             <p>{room.capacity} guests</p>

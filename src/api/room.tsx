@@ -24,6 +24,7 @@ export interface Room {
   booked_dates?: string[];
   description:string;
   image:string;
+  room_number:number;
 }
 
 export interface RoomAvailability {

@@ -81,6 +81,11 @@ const renderStars = (rating: number) => {
   );
 };
 
+const displayStatus = (status: string) => {
+  if (status === "rejected") return "Cancelled";
+  return status.toUpperCase();
+};
+
 const ReservationsTable = ({
   reservations,
   loading,
@@ -165,16 +170,16 @@ const ReservationsTable = ({
                 </td>
                 <td>{reservation.room_id_populated?.room_type}</td>
                 <td>₱{reservation.total_price.toLocaleString()}</td>
-                <td>
-                  <span
-                    className="font-bold"
-                    style={{
-                      color: getStatusColor(reservation.status),
-                    }}
-                  >
-                    {reservation.status.toUpperCase()}
-                  </span>
-                </td>
+                  <td>
+                    <span
+                      className="font-bold"
+                      style={{
+                        color: getStatusColor(reservation.status),
+                      }}
+                    >
+                      {displayStatus(reservation.status)}
+                    </span>
+                  </td>
                 <td className="text-right">
                   <Link
                     to={`/view/reservation/${reservation._id}`}

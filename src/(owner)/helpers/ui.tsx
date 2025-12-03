@@ -7,7 +7,7 @@ export const getStatusColor = (status: string) => {
     case "rejected":
       return "#EF4444";
     case "cancelled":
-      return "#6B7280";
+      return "#EF4444";
     case "completed":
       return "#8B5CF6";
     default:
