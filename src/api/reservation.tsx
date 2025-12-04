@@ -17,6 +17,7 @@ export interface Reservation {
     room_type: string;
     capacity: number;
     price_per_night: number;
+    room_number?:number;
     resort_id: {
       _id: string;
       resort_name: string;

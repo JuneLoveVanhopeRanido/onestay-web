@@ -20,7 +20,6 @@ const ROOM_TYPES = [
 const ROOM_STATUSES = [
   { value: "available", label: "Available" },
   { value: "maintenance", label: "Under Maintenance" },
-  { value: "occupied", label: "Occupied" },
 ];
 
 interface EditRoomModalProps {
@@ -334,7 +333,7 @@ export default function EditRoomModal({
             <label className="label">
               <span className="label-text font-bold">Room Status</span>
             </label>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-2 gap-2">
               {ROOM_STATUSES.map((status) => (
                 <button
                   type="button"

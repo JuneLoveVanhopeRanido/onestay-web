@@ -185,7 +185,7 @@ export default function GuestsScreen() {
                   </td>
                   <td>{reservation.user_id_populated?.username}</td>
                   <td>{reservation.user_id_populated?.email}</td>
-                  <td>{reservation.room_id_populated?.room_type}</td>
+                  <td>{reservation.room_id_populated?.room_type} {reservation.room_id_populated?.room_number ?? "-"}</td>
                   <td>₱{reservation.total_price.toLocaleString()}</td>
                   <td>
                     <span

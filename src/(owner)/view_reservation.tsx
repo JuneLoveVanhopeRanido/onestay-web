@@ -159,7 +159,7 @@ export default function ViewReservationScreen() {
             <input
               type="text"
               className="input w-full"
-              value={(reservation.room_id as any)?.room_type || "N/A"}
+              value={((reservation.room_id as any)?.room_type + " " + (reservation.room_id as any)?.room_number) || "N/A"}
               disabled={true}
             />
           </fieldset>

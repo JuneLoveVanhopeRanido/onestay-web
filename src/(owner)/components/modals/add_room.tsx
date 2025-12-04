@@ -37,8 +37,7 @@ const ROOM_TYPES = [
 
 const ROOM_STATUSES = [
   { value: "available", label: "Available" },
-  { value: "maintenance", label: "Under Maintenance" },
-  { value: "occupied", label: "Occupied" },
+  { value: "maintenance", label: "Under Maintenance" }
 ];
 
 const INITIAL_FORM_STATE = {
@@ -350,7 +349,7 @@ export default function CreateRoomModal({
             <label className="label">
               <span className="label-text font-bold">Initial Room Status</span>
             </label>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-2 gap-2">
               {ROOM_STATUSES.map((status) => (
                 <button
                   key={status.value}

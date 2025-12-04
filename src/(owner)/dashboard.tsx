@@ -168,7 +168,7 @@ const ReservationsTable = ({
                 <td>
                   {dayjs(reservation.end_date).format("hh:mm A, MMMM DD, YYYY")}
                 </td>
-                <td>{reservation.room_id_populated?.room_type}</td>
+                <td>{reservation.room_id_populated?.room_type} {reservation.room_id_populated?.room_number ?? "-"}</td>
                 <td>₱{reservation.total_price.toLocaleString()}</td>
                   <td>
                     <span
