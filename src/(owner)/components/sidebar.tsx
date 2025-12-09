@@ -17,6 +17,7 @@ import { useResortStore } from "../store/resort";
 import { chatService } from "../../api/chat";
 
 import { useState, useEffect } from "react";
+import { reservationAPI } from "../../api/reservation";
 
 
 export default function Sidebar() {
@@ -25,6 +26,8 @@ export default function Sidebar() {
   const navigate = useNavigate();
   
   const [unreadCount, setUnreadCount] = useState(0);
+  const [guestCount, setGuestCount] = useState(0);
+
 
   const { resorts, loading: resortsLoading, hasResorts } = useResortStore();
 
@@ -73,9 +76,29 @@ export default function Sidebar() {
       }
     };
 
+    const loadGuestCount = async () => {
+      try {
+        const filterValue = "pending";
+
+        const response = await reservationAPI.getOwnerReservations({
+          status: filterValue,
+          sortBy: "createdAt",
+          sortOrder: "desc",
+        });
+
+        setGuestCount(response.reservations.length);
+        console.log('reservatiossssssssssn',response.reservations.length)
+      } catch (err) {
+        console.error("Error loading guest count:", err);
+      }
+    };
+
+
+
     useEffect(() => {
       if (!resortsLoading && hasResorts) {
         loadChats();
+        loadGuestCount();
       }
     }, [resortsLoading, hasResorts, resorts]);
 
@@ -126,6 +149,8 @@ export default function Sidebar() {
         {navItems.map((item) => {
           const Icon = item.icon;
           const isMessages = item.label === "Messages";
+          const isGuests = item.label === "Guests";
+
 
           return (
             <button
@@ -153,7 +178,23 @@ export default function Sidebar() {
                     {unreadCount}
                   </span>
                 )}
+                {isGuests && guestCount > 0 && (
+                  <span
+                   className="
+                      absolute -top-1 -right-1 
+                      bg-red-500 text-white 
+                      text-xs rounded-full 
+                      px-1.5 py-0.5 
+                      min-w-[18px] text-center
+                    "
+                  >
+                    {guestCount}
+                  </span>
+                )}
               </div>
+
+
+
 
               {item.label}
             </button>
