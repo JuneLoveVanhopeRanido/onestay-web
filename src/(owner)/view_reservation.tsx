@@ -3,7 +3,7 @@ import Sidebar from "./components/sidebar";
 import { useEffect, useState, useCallback } from "react";
 import { reservationAPI, type Reservation } from "../api/reservation";
 import dayjs from "dayjs";
-import { AlertCircle, Check, X } from "lucide-react";
+import { AlertCircle, Check } from "lucide-react";
 import { getStatusColor } from "./helpers/ui";
 import { useParams } from "react-router";
 
@@ -217,18 +217,7 @@ export default function ViewReservationScreen() {
           <div className="flex flex-row gap-4 items-center w-full">
             {reservation.status === "approved" && (
               <>
-                <button
-                  className="btn btn-neutral flex-1"
-                  onClick={() => handleUpdateStatus("cancelled")}
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? (
-                    <span className="loading loading-spinner"></span>
-                  ) : (
-                    <X size={18} />
-                  )}
-                  Cancel Reservation
-                </button>
+                
                 <div
                   className="tooltip flex-1"
                   data-tip={
