@@ -169,6 +169,7 @@ export default function GuestsScreen() {
             <thead>
               <tr>
                 <th>Booking ID</th>
+                <th>Date</th>
                 <th>Name</th>
                 <th>Email</th>
                 <th>Room Type</th>
@@ -182,6 +183,15 @@ export default function GuestsScreen() {
                 <tr key={reservation._id} className="hover">
                   <td className="font-mono text-xs opacity-80">
                     {reservation._id}
+                  </td>
+                  <td>
+                    {new Date(reservation.createdAt).toLocaleString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                        hour: "numeric",
+                        minute: "numeric",
+                      })}
                   </td>
                   <td>{reservation.user_id_populated?.username}</td>
                   <td>{reservation.user_id_populated?.email}</td>

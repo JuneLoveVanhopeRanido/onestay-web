@@ -75,6 +75,8 @@ export default function ReportsScreen() {
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedMonth, setSelectedMonth] = useState("All");
+
 
   const [pdfFilterMonth, setPdfFilterMonth] = useState("All");
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
@@ -148,8 +150,13 @@ export default function ReportsScreen() {
       }
     });
 
+    if (selectedMonth !== "All") {
+      const idx = allMonths.indexOf(selectedMonth);
+      return [salesData[idx]]; // Only the selected month
+    }
+
     return salesData;
-  }, [reservations]);
+  }, [reservations,selectedMonth]);
 
   const roomTypeData = useMemo(() => {
     const counts: { [key: string]: number } = {};
@@ -354,7 +361,7 @@ export default function ReportsScreen() {
         <div className="flex flex-row gap-4 items-center">
           <label className="flex items-center gap-4">
             <ListFilter size={36} className="opacity-70" />
-            <span className="font-medium text-nowrap">Filter by Status</span>
+            <span className="font-medium text-nowrap">Filters</span>
             <select
               className="select select-bordered select-sm"
               value={selectedFilter}
@@ -366,6 +373,17 @@ export default function ReportsScreen() {
               <option value="confirmed">Confirmed</option>
               <option value="cancelled">Cancelled</option>
               <option value="completed">Completed</option>
+            </select>
+            <select
+              className="select select-bordered select-sm"
+              value={selectedMonth}
+              onChange={(e) => setSelectedMonth(e.target.value)}
+              disabled={loading}
+            >
+              <option value="All">All Month</option>
+              {allMonths.map((month) => (
+                <option value={month}>{month}</option>
+              ))}
             </select>
           </label>
         </div>
