@@ -9,6 +9,7 @@ export interface Reservation {
   end_date: string;
   total_price: number;
   status: "pending" | "approved" | "rejected" | "completed" | "cancelled";
+  reason: string;
   deleted: boolean;
   createdAt: string;
   updatedAt: string;

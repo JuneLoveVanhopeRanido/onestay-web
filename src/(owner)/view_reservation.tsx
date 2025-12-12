@@ -204,6 +204,20 @@ export default function ViewReservationScreen() {
           </fieldset>
         </div>
 
+        {reservation.status === "cancelled" && (<div className="grid grid-cols-1 md:grid-cols-1 gap-4">
+          <fieldset className="fieldset">
+            <legend className="fieldset-legend">Reason:</legend>
+            <input
+              type="text"
+              className="input w-full"
+              value={reservation.reason}
+              disabled={true}
+            />
+          </fieldset>
+        </div>)
+        }
+
+
         <div className="flex flex-col gap-4 items-center mt-6">
           {actionError && (
             <div className="alert alert-error shadow-lg">
