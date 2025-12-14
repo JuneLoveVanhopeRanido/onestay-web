@@ -169,7 +169,7 @@ export default function GuestsScreen() {
             <thead>
               <tr>
                 <th>Booking ID</th>
-                <th>Date</th>
+                <th>Date Reserved</th>
                 <th>Name</th>
                 <th>Email</th>
                 <th>Room Type</th>

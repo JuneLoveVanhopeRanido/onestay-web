@@ -71,6 +71,9 @@ export default function ReportsScreen() {
     filename: pdfFilename,
   });
 
+  const VALID_SALES_STATUSES = ["approved", "confirmed", "completed"];
+
+
   const [selectedFilter, setSelectedFilter] = useState("All");
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [loading, setLoading] = useState(true);
@@ -84,6 +87,14 @@ export default function ReportsScreen() {
   useEffect(() => {
     document.title = "OneStay / Reports";
   }, []);
+
+  const filteredReservations = useMemo(() => {
+    return reservations.filter((r) => {
+      if (selectedFilter === "All") return true;
+      return r.status === selectedFilter.toLowerCase();
+    });
+  }, [reservations, selectedFilter]);
+
 
   useEffect(() => {
     if (isGeneratingPdf) {
@@ -134,106 +145,99 @@ export default function ReportsScreen() {
     }
   }, [selectedFilter]);
 
-  const monthlySalesData = useMemo(() => {
-    const salesData = allMonths.map((month) => ({
-      month: month.substring(0, 3),
-      sales: 0,
-    }));
+const monthlySalesData = useMemo(() => {
+  const salesData = allMonths.map((m) => ({
+    month: m.substring(0, 3),
+    sales: 0,
+  }));
 
-    reservations.forEach((reservation) => {
-      if (
-        reservation.status === "approved" ||
-        reservation.status === "completed"
-      ) {
-        const monthIndex = dayjs(reservation.start_date).month();
-        salesData[monthIndex].sales += reservation.total_price;
-      }
-    });
-
-    if (selectedMonth !== "All") {
-      const idx = allMonths.indexOf(selectedMonth);
-      return [salesData[idx]]; // Only the selected month
+  filteredReservations.forEach((r) => {
+    if (VALID_SALES_STATUSES.includes(r.status)) {
+      salesData[dayjs(r.start_date).month()].sales += r.total_price;
     }
+  });
 
-    return salesData;
-  }, [reservations,selectedMonth]);
+  if (selectedMonth !== "All") {
+    const idx = allMonths.indexOf(selectedMonth);
+    return idx !== -1 ? [salesData[idx]] : [];
+  }
 
-  const roomTypeData = useMemo(() => {
-    const counts: { [key: string]: number } = {};
+  return salesData;
+}, [filteredReservations, selectedMonth]);
 
-    reservations.forEach((reservation) => {
-      const roomType = reservation.room_id_populated?.room_type;
-      if (roomType) {
-        counts[roomType] = (counts[roomType] || 0) + 1;
-      }
-    });
 
-    return Object.entries(counts).map(([name, value]) => ({
-      name,
-      value,
-    }));
-  }, [reservations]);
+const roomTypeData = useMemo(() => {
+  const counts: Record<string, number> = {};
 
-  const pdfData = useMemo(() => {
-    const filteredReservations = reservations.filter((r) => {
-      if (pdfFilterMonth === "All") return true;
-      const rMonthIndex = dayjs(r.start_date).month();
-      const targetMonthIndex = allMonths.indexOf(pdfFilterMonth);
-      return rMonthIndex === targetMonthIndex;
-    });
+  filteredReservations.forEach((r) => {
+    const type = r.room_id_populated?.room_type;
+    if (type) counts[type] = (counts[type] || 0) + 1;
+  });
 
-    const salesData = allMonths.map((month) => ({
-      month: month.substring(0, 3),
-      sales: 0,
-    }));
+  return Object.entries(counts).map(([name, value]) => ({ name, value }));
+}, [filteredReservations]);
 
-    filteredReservations.forEach((reservation) => {
-      if (
-        reservation.status === "approved" ||
-        reservation.status === "completed"
-      ) {
-        const monthIndex = dayjs(reservation.start_date).month();
-        salesData[monthIndex].sales += reservation.total_price;
-      }
-    });
 
-    const roomCounts: { [key: string]: number } = {};
-    filteredReservations.forEach((reservation) => {
-      const roomType = reservation.room_id_populated?.room_type;
-      if (roomType) {
-        roomCounts[roomType] = (roomCounts[roomType] || 0) + 1;
-      }
-    });
-    const roomData = Object.entries(roomCounts).map(([name, value]) => ({
-      name,
-      value,
-    }));
+const pdfData = useMemo(() => {
+  const filtered = filteredReservations.filter((r) => {
+    if (pdfFilterMonth === "All") return true;
+    return (
+      dayjs(r.start_date).month() === allMonths.indexOf(pdfFilterMonth)
+    );
+  });
 
-    const salesByMonth: {
-      [month: string]: { roomType: string; price: number; id: string }[];
-    } = {};
-    filteredReservations.forEach((reservation) => {
-      if (
-        reservation.status === "approved" ||
-        reservation.status === "completed"
-      ) {
-        const monthIndex = dayjs(reservation.start_date).month();
-        const monthName = allMonths[monthIndex];
+  const salesData = allMonths.map((m) => ({
+    month: m.substring(0, 3),
+    sales: 0,
+  }));
 
-        if (!salesByMonth[monthName]) {
-          salesByMonth[monthName] = [];
-        }
+  const salesByMonth: Record<
+    string,
+    { id: string; roomType: string; price: number }[]
+  > = {};
 
-        salesByMonth[monthName].push({
-          id: reservation._id,
-          roomType: reservation.room_id_populated?.room_type || "N/A",
-          price: reservation.total_price,
-        });
-      }
-    });
+  filtered.forEach((r) => {
+    if (VALID_SALES_STATUSES.includes(r.status)) {
+      const monthIdx = dayjs(r.start_date).month();
+      const monthName = allMonths[monthIdx];
 
-    return { salesData, roomData, salesByMonth };
-  }, [reservations, pdfFilterMonth]);
+      salesData[monthIdx].sales += r.total_price;
+
+      if (!salesByMonth[monthName]) salesByMonth[monthName] = [];
+      salesByMonth[monthName].push({
+        id: r._id,
+        roomType: r.room_id_populated?.room_type || "N/A",
+        price: r.total_price,
+      });
+    }
+  });
+
+  let finalSalesData = salesData;
+  if (pdfFilterMonth !== "All") {
+    const idx = allMonths.indexOf(pdfFilterMonth);
+    finalSalesData = idx !== -1 ? [salesData[idx]] : [];
+  }
+
+  const roomCounts: Record<string, number> = {};
+  filtered.forEach((r) => {
+    const type = r.room_id_populated?.room_type;
+    if (type) roomCounts[type] = (roomCounts[type] || 0) + 1;
+  });
+
+  const roomData = Object.entries(roomCounts).map(([name, value]) => ({
+    name,
+    value,
+  }));
+
+  return {
+    salesData: finalSalesData,
+    roomData,
+    salesByMonth, // ✅ RESTORED
+  };
+}, [filteredReservations, pdfFilterMonth]);
+
+
+
 
   useEffect(() => {
     fetchReservations();
