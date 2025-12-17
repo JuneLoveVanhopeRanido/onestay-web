@@ -119,7 +119,18 @@ export default function RoomsScreen() {
             <h3 className="font-bold text-lg">
               ₱{room.price_per_night.toLocaleString()}/night
             </h3>
-            <div className="badge badge-primary">{room.status}</div>
+            <div
+  className={`badge text-white capitalize ${
+    room.status === "maintenance"
+      ? "bg-red-500"
+      : room.status === "available"
+      ? "bg-green-500"
+      : "bg-blue-500"
+  }`}
+>
+  {room.status}
+</div>
+
           </div>
         </div>
       </Link>
